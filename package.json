@@ -1,0 +1,19 @@
+{
+  "name": "photogrammetry-server",
+  "version": "1.0.0",
+  "description": "This repository holds an expressjs server which will launch a photogrammetry process via Docker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rodolfoBocanegra/photogrammetry-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rodolfoBocanegra/photogrammetry-server/issues"
+  },
+  "homepage": "https://github.com/rodolfoBocanegra/photogrammetry-server#readme"
+}
