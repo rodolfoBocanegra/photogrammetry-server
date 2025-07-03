@@ -6,7 +6,7 @@ const port = 3000;
 app.get('/health', (req, res) => {
     res.json({
         status: 'ok',
-        message: 'Servidor Express corriendo'
+        message: 'Express server running',
     });
 });
 
