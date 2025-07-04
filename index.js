@@ -42,14 +42,24 @@ app.get('/health', (req, res) => {
 
 app.post('/process', async (req, res) => {
   try {
-    // Expect JSON body like { build: true, tag: 'my-image' }
-    const { build: shouldBuild = false, tag = 'docker-image' } = req.body;
+    // Basic validation of request body
+    const { shouldBuild, imageName } = req.body;
+    if (shouldBuild !== undefined && typeof shouldBuild !== 'boolean') {
+      return res.status(400).send("Request property 'shouldBuild' must be a boolean");
+    }
+    if (imageName !== undefined && typeof imageName !== 'string') {
+      return res.status(400).send("Request property 'imageName' must be a string");
+    }
+
+    // Assign defaults
+    const buildFlag = shouldBuild === true;
+    const tag = imageName || 'hello-python';
 
     // Set plain text response headers
     res.setHeader('Content-Type', 'text/plain');
 
     // 1) Optionally build the image with dynamic tag
-    await buildImageIfNeeded(tag, shouldBuild);
+    await buildImageIfNeeded(tag, buildFlag);
 
     // 2) Create output stream and pipe to response
     const outputStream = new PassThrough();
