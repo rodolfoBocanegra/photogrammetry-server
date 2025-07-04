@@ -4,9 +4,34 @@ const Docker = require('dockerode');
 const { PassThrough } = require('stream')
 
 const app = express();
+app.use(express.json());
 const port = 3000;
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+
+/**
+ * Builds the specified Docker image if shouldBuild === true.
+ * @param {string} tag - The image tag to build.
+ * @param {boolean} shouldBuild
+ */
+async function buildImageIfNeeded(tag, shouldBuild) {
+  if (!shouldBuild) return;
+
+  const context = path.resolve(__dirname);
+  console.log(`Starting build of the ${tag} image...`);
+  const buildStream = await docker.buildImage(
+    { context, src: ['Dockerfile'] },
+    { t: tag }
+  );
+
+  return new Promise((resolve, reject) => {
+    docker.modem.followProgress(buildStream, (err, output) => {
+      if (err) return reject(err);
+      console.log('Build completed.');
+      resolve(output);
+    });
+  });
+}
 
 app.get('/health', (req, res) => {
     res.json({
@@ -16,30 +41,54 @@ app.get('/health', (req, res) => {
 });
 
 app.post('/process', async (req, res) => {
-    try {
-        const outputStream = new PassThrough()
+  try {
+    // Expect JSON body like { build: true, tag: 'my-image' }
+    const { build: shouldBuild = false, tag = 'docker-image' } = req.body;
 
+    // Set plain text response headers
+    res.setHeader('Content-Type', 'text/plain');
+
+    // 1) Optionally build the image with dynamic tag
+    await buildImageIfNeeded(tag, shouldBuild);
+
+    // 2) Create output stream and pipe to response
+    const outputStream = new PassThrough();
+    outputStream.pipe(res);
+
+    // Container options
     const options = {
       HostConfig: {
-        AutoRemove: true  // limpia el contenedor al terminar
-      }
+        AutoRemove: true
+        }
     };
-    outputStream.pipe(res)
-    res.setHeader('Content-Type', 'text/plain');
-    docker.run('hello-python', [], outputStream, options, (err, data, container) => {
-      if (err) {
-        console.error('Error corriendo el contenedor:', err);
-        return res.status(500).end(`Error container: ${err.message}`);
-      }
 
-      outputStream.on('close', ()=> res.end())
+    // Handle stream errors
+    outputStream.on('error', err => {
+      console.error('Error in outputStream:', err);
+      if (!res.headersSent) res.status(500);
+      res.end(`Internal error: ${err.message}`);
+    });
+
+    // 3) Run the container using the dynamic tag
+    docker.run(tag, [], outputStream, options, (err, data) => {
+        if (err) {
+          console.error('Error while running container:', err);
+          outputStream.emit('error', err);
+          return;
+        }
+        outputStream.end(`\n> Container exited with code ${data.StatusCode}\n`);
+      }
+    ).on('error', err => {
+      console.error('Error in docker.run():', err);
+      outputStream.emit('error', err);
     });
 
   } catch (err) {
-    console.error('Error en /process:', err);
-    res.status(500).send(err.message);
+    console.error('Error in /process:', err);
+    if (!res.headersSent) res.status(500).send(err.message);
+    else res.end(`Error: ${err.message}`);
   }
-})
+});
 
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
