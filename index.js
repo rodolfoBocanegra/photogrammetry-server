@@ -2,9 +2,11 @@ const express = require('express');
 const path = require('path')
 const Docker = require('dockerode');
 const { PassThrough } = require('stream')
+const cors = require('cors')
 
 const app = express();
 app.use(express.json());
+app.use(cors({ origin: 'http://localhost:4200' })) // TODO: enable only if in local env
 const port = 3000;
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
