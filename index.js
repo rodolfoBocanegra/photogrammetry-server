@@ -81,6 +81,8 @@ app.post('/process', async (req, res) => {
       res.end(`Internal error: ${err.message}`);
     });
 
+    outputStream.on('data', (data) => console.log(data.toString('utf-8')))
+
     // 3) Run the container using the dynamic tag
     docker.run(tag, [], outputStream, options, (err, data) => {
         if (err) {
