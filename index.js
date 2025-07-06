@@ -70,9 +70,20 @@ app.post('/process', async (req, res) => {
     // Container options
     const options = {
       HostConfig: {
-        AutoRemove: true
-        }
+        AutoRemove: true,
+      },
+      Env: [
+        `ENVIRONMENT=${process.env.ENVIRONMENT}`,
+        `S3_REGION=${process.env.S3_REGION}`,
+        `S3_ACCESS_KEY_ID=${process.env.S3_ACCESS_KEY_ID}`,
+        `S3_SECRET_ACCESS_KEY=${process.env.S3_SECRET_ACCESS_KEY}`,
+        `S3_BUCKET=${process.env.S3_BUCKET}`
+      ]
     };
+
+    if (options.Env.filter(entry => entry.includes('undefined')).length > 0) {
+      console.err("Could not find values for all needed env vars")
+    }
 
     // Handle stream errors
     outputStream.on('error', err => {
