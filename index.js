@@ -55,7 +55,7 @@ app.post('/process', async (req, res) => {
 
     // Assign defaults
     const buildFlag = shouldBuild === true;
-    const tag = imageName || 'hello-python';
+    const tag = imageName || 'photogrammetry-colmap';
 
     // Set plain text response headers
     res.setHeader('Content-Type', 'text/plain');
