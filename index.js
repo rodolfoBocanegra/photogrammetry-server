@@ -84,7 +84,8 @@ app.post('/process', async (req, res) => {
     outputStream.on('data', (data) => console.log(data.toString('utf-8')))
 
     // 3) Run the container using the dynamic tag
-    docker.run(tag, [], outputStream, options, (err, data) => {
+    const s3Prefix = 'test1235' // Using as default prefix for debugging
+    docker.run(tag, [s3Prefix], outputStream, options, (err, data) => {
         if (err) {
           console.error('Error while running container:', err);
           outputStream.emit('error', err);
