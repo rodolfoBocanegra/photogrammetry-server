@@ -82,7 +82,8 @@ app.post('/process', async (req, res) => {
     };
 
     if (options.Env.filter(entry => entry.includes('undefined')).length > 0) {
-      console.error("Could not find values for all needed env vars")
+      console.error("Could not find values for all needed env vars, aborting photogrammetry process.")
+      res.send(`Internal error, server is available but it could not start the photogrammetry process.`)
       return
     }
 
