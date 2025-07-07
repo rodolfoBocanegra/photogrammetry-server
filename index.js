@@ -45,12 +45,19 @@ app.get('/health', (req, res) => {
 app.post('/process', async (req, res) => {
   try {
     // Basic validation of request body
-    const { shouldBuild, imageName } = req.body;
+    const {
+      shouldBuild,
+      imageName,
+      photogrammetryId,
+    } = req.body;
     if (shouldBuild !== undefined && typeof shouldBuild !== 'boolean') {
       return res.status(400).send("Request property 'shouldBuild' must be a boolean");
     }
     if (imageName !== undefined && typeof imageName !== 'string') {
       return res.status(400).send("Request property 'imageName' must be a string");
+    }
+    if (photogrammetryId !== undefined && typeof photogrammetryId !== 'string') {
+      return res.status(400).send("Request property 'photogrammetryId' must be a string");
     }
 
     // Assign defaults
@@ -97,7 +104,7 @@ app.post('/process', async (req, res) => {
     outputStream.on('data', (data) => console.log(data.toString('utf-8')))
 
     // 3) Run the container using the dynamic tag
-    const s3Prefix = 'test1235' // Using as default prefix for debugging
+    const s3Prefix = photogrammetryId
     const args = [s3Prefix]
     docker.run(tag, args, outputStream, options, (err, data) => {
         if (err) {
