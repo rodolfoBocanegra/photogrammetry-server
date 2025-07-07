@@ -83,6 +83,7 @@ app.post('/process', async (req, res) => {
 
     if (options.Env.filter(entry => entry.includes('undefined')).length > 0) {
       console.error("Could not find values for all needed env vars")
+      return
     }
 
     // Handle stream errors
