@@ -36,7 +36,9 @@ async function buildImageIfNeeded(tag, shouldBuild) {
 }
 
 app.get('/health', (req, res) => {
-    res.status(200).json({
+    res
+      .status(200)
+      .json({
         status: 'ok',
         message: 'Express server running',
     });
