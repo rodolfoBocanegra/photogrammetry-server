@@ -6,7 +6,11 @@ const cors = require('cors')
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:4200' })) // TODO: enable only if in local env
+app.use(cors({ origin: [
+  // TODO: enable only if in local env
+  'http://localhost:4200',
+  'http://localhost:30000',
+]}))
 const port = 3000;
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
