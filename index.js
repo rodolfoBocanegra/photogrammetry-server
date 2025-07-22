@@ -116,7 +116,7 @@ app.post('/process', async (req, res) => {
         if (err) {
           console.error('Error while running container:', err);
           if (err.reason === 'no such container') {
-            outputStream.end(`\n> Error: Container with tag "${tag}" does not exist. Please build the image first.\n`);
+            outputStream.end(`\n> Error: Container with tag "${tag}" does not exist in this server. Please build the image first.\n`);
           }
           outputStream.emit('error', err);
           return;
