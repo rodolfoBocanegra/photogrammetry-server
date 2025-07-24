@@ -117,6 +117,13 @@ app.post('/process', async (req, res) => {
         `${process.cwd()}/input:/data/images:ro`,
         `${process.cwd()}/output:/data/output`
       ];
+      options.HostConfig.DeviceRequests = [
+        {
+          Driver: 'nvidia',
+          Count: -1, // Use all available GPUs
+          Capabilities: [['gpu']]
+        }
+      ];
     }
 
     if (options.Env.filter(entry => entry.includes('undefined')).length > 0) {
