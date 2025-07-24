@@ -6,19 +6,24 @@ const cors = require('cors')
 
 const app = express();
 app.use(express.json());
-let allowedOrigins = []
-if (process.env.ENVIRONMENT === 'local') {
-  allowedOrigins.push('http://localhost:4200');
-  allowedOrigins.push('http://localhost:30000');
-} else if (process.env.ENVIRONMENT === 'production') {
-  if (!process.env.mainServerUrl) {
-    throw new Error('mainServerUrl environment variable is required in production environment');
-  }
-  allowedOrigins.push(process.env.mainServerUrl);
-}
-
 const port = 3000;
 
+function configureCors() {
+  let allowedOrigins = []
+  if (process.env.ENVIRONMENT === 'local') {
+    allowedOrigins.push('http://localhost:4200');
+    allowedOrigins.push('http://localhost:30000');
+  } else if (process.env.ENVIRONMENT === 'production') {
+    if (!process.env.mainServerUrl) {
+      throw new Error('mainServerUrl environment variable is required in production environment');
+    }
+    allowedOrigins.push(process.env.mainServerUrl);
+  } else {
+    throw new Error('ENVIRONMENT must be set to either "local" or "production"');
+  }
+}
+
+configureCors();
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
 /**
