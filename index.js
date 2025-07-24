@@ -110,6 +110,15 @@ app.post('/process', async (req, res) => {
       ]
     };
 
+    if (tag === 'photogrammetry-colmap-cuda') {
+      // Bind input and output directories for CUDA-enabled image
+      // this is the equivalent of the -v params in: `docker run -v /input:/data/images:ro -v /output:/data/output`
+      options.HostConfig.Binds = [
+        `${process.cwd()}/input:/data/images:ro`,
+        `${process.cwd()}/output:/data/output`
+      ];
+    }
+
     if (options.Env.filter(entry => entry.includes('undefined')).length > 0) {
       console.error("Could not find values for all needed env vars, aborting photogrammetry process.")
       res.send(`Internal error, server is available but it could not start the photogrammetry process.`)
