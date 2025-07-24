@@ -123,9 +123,19 @@ app.post('/process', async (req, res) => {
         }
         outputStream.end(`\n> Container exited with code ${data.StatusCode}\n`);
       }
-    ).on('error', err => {
+    )
+    .on('error', err => {
       console.error('Error in docker.run():', err);
       outputStream.emit('error', err);
+    })
+    .on('end', () => {
+      console.log('Container run completed.');
+      outputStream.end('\n> Process completed.\n');
+      res.json({
+        status: 'ok',
+        message: 'Photogrammetry process completed successfully.',
+        imageName: tag,
+      });
     });
 
   } catch (err) {
