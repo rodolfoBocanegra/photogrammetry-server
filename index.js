@@ -21,6 +21,9 @@ function configureCors() {
   } else {
     throw new Error('ENVIRONMENT must be set to either "local" or "production"');
   }
+  app.use(cors({
+    origin: allowedOrigins,
+  }));
 }
 
 configureCors();
