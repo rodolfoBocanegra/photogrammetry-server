@@ -6,11 +6,17 @@ const cors = require('cors')
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: [
-  // TODO: enable only if in local env
-  'http://localhost:4200',
-  'http://localhost:30000',
-]}))
+let allowedOrigins = []
+if (process.env.ENVIRONMENT === 'local') {
+  allowedOrigins.push('http://localhost:4200');
+  allowedOrigins.push('http://localhost:30000');
+} else if (process.env.ENVIRONMENT === 'production') {
+  if (!process.env.mainServerUrl) {
+    throw new Error('mainServerUrl environment variable is required in production environment');
+  }
+  allowedOrigins.push(process.env.mainServerUrl);
+}
+
 const port = 3000;
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
