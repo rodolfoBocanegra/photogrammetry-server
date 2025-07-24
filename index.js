@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('morgan');
 const path = require('path')
 const Docker = require('dockerode');
 const { PassThrough } = require('stream')
@@ -6,6 +7,7 @@ const cors = require('cors')
 
 const app = express();
 app.use(express.json());
+app.use(logger('dev'));
 const port = 3000;
 
 function configureCors() {
