@@ -14,10 +14,10 @@ function configureCors() {
     allowedOrigins.push('http://localhost:4200');
     allowedOrigins.push('http://localhost:30000');
   } else if (process.env.ENVIRONMENT === 'production') {
-    if (!process.env.mainServerUrl) {
-      throw new Error('mainServerUrl environment variable is required in production environment');
+    if (!process.env.MAIN_SERVER_URL) {
+      throw new Error('MAIN_SERVER_URL environment variable is required in production environment');
     }
-    allowedOrigins.push(process.env.mainServerUrl);
+    allowedOrigins.push(process.env.MAIN_SERVER_URL);
   } else {
     throw new Error('ENVIRONMENT must be set to either "local" or "production"');
   }
