@@ -127,7 +127,10 @@ app.post('/process', async (req, res) => {
 
     // 3) Run the container using the dynamic tag
     const s3Prefix = photogrammetryId
-    const args = [s3Prefix]
+    const args =
+      tag === 'photogrammetry-colmap' ? [s3Prefix] : 
+      tag === 'photogrammetry-colmap-cuda' ? ['/data/images', '/data/output']
+      : []
     docker.run(tag, args, outputStream, options, (err, data) => {
         if (err) {
           console.error('Error while running container:', err);
